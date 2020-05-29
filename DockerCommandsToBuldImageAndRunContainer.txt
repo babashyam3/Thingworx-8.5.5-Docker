@@ -1,0 +1,30 @@
+
+
+TAG_VERSION=java8u212-tomcat9.0.21
+TOMCAT_ARCHIVE=apache-tomcat-9.0.21.tar.gz
+
+dockerfiles/base
+
+docker build --build-arg JAVA_VERSION=8u212 --build-arg JAVA_ARCHIVE=jdk-8u212-linux-x64.tar.gz -t thingworx/base:java8u212-tomcat9.0.21 -t thingworx/base:latest .
+
+
+
+
+dockerfiles/platform/base
+
+
+docker build --build-arg TAG_VERSION=java8u212-tomcat9.0.21 --build-arg TOMCAT_VERSION=9.0.21 --build-arg TOMCAT_ARCHIVE=apache-tomcat-9.0.21.tar.gz --build-arg LICENSE_FILE=LICENSE --build-arg PLATFORM_SETTINGS_FILE=platform-settings.json --build-arg TEMPLATE_PROCESSOR_ARCHIVE=template-processor-12.1.0.13-application.tar.gz --build-arg SECURITY_TOOL_ARCHIVE=security-common-cli-1.0.2.46-application.tar.gz -t thingworx/tw-platform-base:java8u212-tomcat9.0.21 -t thingworx/tw-platform-base:latest .
+
+
+dockerfiles/databases/postgres
+
+docker build --build-arg PLATFORM_ARCHIVE=ThingWorx-Platform-Postgres-8-5-5.zip --build-arg PLATFORM_VERSION=8-5-5 -t thingworx/postgres-db:java8u212-tomcat9.0.21-platform8-5-5 -t thingworx/postgres-db:latest .
+
+
+dockerfiles/platform/postgres
+
+docker build --build-arg TAG_VERSION=java8u212-tomcat9.0.21 --build-arg PLATFORM_ARCHIVE=ThingWorx-Platform-Postgres-8-5-5.zip --build-arg PLATFORM_VERSION=8-5-5 -t thingworx/platform-postgres:java8u212-tomcat9.0.21-platform8-5-5 -t thingworx/platform-postgres:latest .
+
+/
+
+docker-compose -f docker-compose-postgres.yml up -d

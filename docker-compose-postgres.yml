@@ -1,0 +1,43 @@
+version: '2.2'
+
+services:
+  postgresql:
+    image: thingworx/postgres-db:latest
+    ports:
+      - "5432"
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 15s
+    environment:
+      # NOTE: Set TWX_DATABASE_USERNAME, TWX_DATABASE_PASSWORD TWX_DATABASE_SCHEMA for
+      # the thingworx database setup that will be created in this database.
+      - "TWX_DATABASE_USERNAME=thingworx"
+      - "TWX_DATABASE_SCHEMA=thingworx"
+      - "TWX_DATABASE_PASSWORD=password"
+
+  platform:
+    image: thingworx/platform-postgres:latest
+    healthcheck:
+      test: curl -f localhost:8080/Thingworx/health
+      interval: 15s
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      - "INITIAL_HEAP=2"
+      - "MAX_HEAP=4"
+      - "DATABASE_HOST=postgresql"
+      - "DATABASE_PORT=5432"
+      # NOTE: Set TWX_DATABASE_USERNAME, TWX_DATABASE_PASSWORD TWX_DATABASE_SCHEMA for
+      # the thingworx database setup that will either be created by the docker image,
+      # or connected to if it already exists.
+      - "TWX_DATABASE_USERNAME=thingworx"
+      - "TWX_DATABASE_SCHEMA=thingworx"
+      - "TWX_DATABASE_PASSWORD=password"
+      # NOTE: The following must be set for the Platform to start. This will be
+      # the initial Administrator password.
+      - "THINGWORX_INITIAL_ADMIN_PASSWORD=thingworx@1234"
+
